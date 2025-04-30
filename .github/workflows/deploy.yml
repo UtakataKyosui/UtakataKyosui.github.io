@@ -36,6 +36,8 @@ jobs:
             echo "# ようこそ" > docs/intro.md
             echo "" >> docs/intro.md
             echo "これは Obsidian の公開ページです。" >> docs/intro.md
+            echo "このページは、Obsidian のドキュメントを表示するために使用されます。" >> docs/intro.md
+            echo "このページは、GitHub Actions を使用して自動的に生成されます。" >> docs/intro.md
           fi
 
       - name: Build Docusaurus site
