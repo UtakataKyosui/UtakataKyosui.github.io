@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug - Check if submodule repo is accessible
+        run: |
+          curl -I -H "Authorization: token ${{ secrets.GH_TOKEN }}" https://api.github.com/repos/UtakataKyosui/Utakata-Obsidian
+
       - uses: actions/checkout@v4
         with:
           submodules: true
