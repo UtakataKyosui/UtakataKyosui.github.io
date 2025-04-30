@@ -12,56 +12,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
-      - name: Copy markdown files from Obsidian to docs
+      - name: Sync Obsidian public docs
         run: |
-          rsync -av --exclude='.git' ./obsidian/public/ ./docs/
+          mkdir -p docs
+          cp -r Utakata-Obsidian/public/* docs/
 
-      - name: Ensure intro.md exists
+      - name: Generate docs/intro.md if not present
         run: |
-          if [ ! -f "./docs/intro.md" ]; then
-            cat << 'EOF' > ./docs/intro.md
-            ---
-            id: intro
-            title: はじめに
-            sidebar_position: 1
-            ---
-
-            # ようこそ 🎉
-
-            このドキュメントは、プロジェクトの概要や使い方、開発のヒントなどをわかりやすくまとめたものです。
-
-            :::tip
-            ここから順番に読み進めていくことで、プロジェクトの全体像がつかめるようになっています！
-            :::
-
-            ## 次に読みたいページ
-
-            - [セットアップ手順](./setup)
-            - [機能の紹介](./features)
-            - [よくある質問](./faq)
-
-            ---
-
-            > 💡 このページは `docs/intro.md` によって提供されています。自由に編集して、あなたのプロジェクトに合わせた内容にしてね！
-            EOF
+          if [ ! -f docs/intro.md ]; then
+            echo "# ようこそ" > docs/intro.md
+            echo "" >> docs/intro.md
+            echo "これは Obsidian の公開ページです。" >> docs/intro.md
           fi
-      - name: Build Docusaurus
-        run: yarn build
 
-      - name: Build Docusaurus
+      - name: Build Docusaurus site
         run: yarn build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
