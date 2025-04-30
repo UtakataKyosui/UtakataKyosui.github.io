@@ -9,24 +9,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          submodules: true  # ここが重要！
-          token: ${{ secrets.GH_TOKEN }}  # ここで認証を通す！
+          submodules: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 20
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Copy obsidian public files to docs
+      - name: Copy markdown files from Obsidian to docs
         run: |
-          rm -rf docs/*
-          cp -r obsidian/public/* docs/
+          rsync -av --exclude='.git' ./obsidian/public/ ./docs/
+
+      - name: Ensure intro.md exists
+        run: |
+          if [ ! -f "./docs/intro.md" ]; then
+            cat << 'EOF' > ./docs/intro.md
+            ---
+            id: intro
+            title: はじめに
+            sidebar_position: 1
+            ---
+
+            # ようこそ 🎉
+
+            このドキュメントは、プロジェクトの概要や使い方、開発のヒントなどをわかりやすくまとめたものです。
+
+            :::tip
+            ここから順番に読み進めていくことで、プロジェクトの全体像がつかめるようになっています！
+            :::
+
+            ## 次に読みたいページ
+
+            - [セットアップ手順](./setup)
+            - [機能の紹介](./features)
+            - [よくある質問](./faq)
+
+            ---
+
+            > 💡 このページは `docs/intro.md` によって提供されています。自由に編集して、あなたのプロジェクトに合わせた内容にしてね！
+            EOF
+          fi
+      - name: Build Docusaurus
+        run: yarn build
 
       - name: Build Docusaurus
         run: yarn build
