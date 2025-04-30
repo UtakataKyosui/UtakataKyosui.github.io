@@ -1,8 +1,5 @@
 name: Deploy to GitHub Pages
 
-permissions:
-  contents: write
-
 on:
   push:
     branches: [main] # メインブランチに合わせてください
@@ -15,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-          token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GH_PAT }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
